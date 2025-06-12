@@ -1,11 +1,18 @@
 from fastapi import FastAPI
 from fastapi.params import Body
 from pydantic import BaseModel
+from typing import Optional
+
 
 # for validating the data and its type
 class Post(BaseModel):
     title : str
     content : str
+# setting default val 
+    published : bool = True
+#fully optional 
+    rating : Optional[int] = None
+
 
 app = FastAPI()
 
@@ -27,5 +34,8 @@ def get_posts():
 
 @app.post("/createpost")
 def create_posts(new_post  : Post):
-    print(new_post.title)
+    print(new_post)
+    #converting to dict
+    print(new_post.dict())
+
     return {"message" : "sucess"}
