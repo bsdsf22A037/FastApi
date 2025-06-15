@@ -6,6 +6,27 @@ from typing import Optional
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
+from . import schemas  # If you're inside a FastAPI package
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from .models import Base
+from fastapi import Depends
+from sqlalchemy.orm import Session
+from .database import get_db  
+from . import models
+
+
+            # your User model lives in models.py (or whatever file you named)
+#creating user table 
+DATABASE_URL = "postgresql://postgres:root@localhost:5432/fastapi"
+
+# Create the database engine
+engine = create_engine(DATABASE_URL)
+
+# Create all tables (in this case, it will create the 'users' table)
+Base.metadata.create_all(bind=engine)
+
+print("Tables created successfully.")
 
 app = FastAPI()
 
@@ -54,12 +75,12 @@ def get_posts():
     return {"data": posts}
 
 #creating a post 
-@app.post("/posts",status_code=status.HTTP_201_CREATED)
+@app.post("/posts",status_code=status.HTTP_201_CREATED,response_model=schemas.Post_response)
 def create_posts(post: Post):
     cursor.execute("""INSERT INTO posts (title,content,published) VALUES(%s,%s,%s)RETURNING*""",(post.title,post.content,post.published))
     new_post = cursor.fetchone()
     conn.commit()
-    return {"data": new_post}
+    return new_post
 #retrieving specific post 
 @app.get("/posts/{id}")
 def get_post(id:int):
@@ -91,3 +112,13 @@ def update_post(id : int , post : Post ):
     if not updated_post:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,detail = f'post with {id}not found')
     return updated_post
+
+#create a user 
+@app.post("/users", status_code=status.HTTP_201_CREATED,response_model=schemas.UserOut)
+def create_user(user:schemas.UserCreate ,db: Session = Depends(get_db)):
+    new_user = models.User(**user.dict())
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return new_user
