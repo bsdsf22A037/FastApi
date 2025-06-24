@@ -14,7 +14,7 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 from .database import get_db  
 from . import models
-from .routers import posts,users
+from .routers import posts,users,auth
 
             # your User model lives in models.py (or whatever file you named)
 #creating user table 
@@ -31,11 +31,11 @@ print("Tables created successfully.")
 app = FastAPI()
 
 # for validating the data and its type
-class Post(BaseModel):
-    title: str
-    content: str
-    published: bool = True
-    rating: Optional[int] = None
+# class Post(BaseModel):
+#     title: str
+#     content: str
+#     published: bool = True
+#     rating: Optional[int] = None
 
 # database connection
 
@@ -65,3 +65,5 @@ class Post(BaseModel):
 
 app.include_router(posts.router)
 app.include_router(users.router)
+app.include_router(auth.router)
+
