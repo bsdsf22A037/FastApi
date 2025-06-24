@@ -30,3 +30,7 @@ class Post(BaseModel):
     content: str
     published: bool = True
     rating: Optional[int] = None
+
+class UserLogin(BaseModel):
+    email : EmailStr
+    password : str
