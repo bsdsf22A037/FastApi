@@ -1,4 +1,6 @@
 from pydantic import BaseModel,EmailStr
+from typing import Optional
+
 
 #only fields we want in reponse
 
@@ -23,3 +25,8 @@ class UserOut(BaseModel):
     model_config = {
         "from_attributes": True
     }
+class Post(BaseModel):
+    title: str
+    content: str
+    published: bool = True
+    rating: Optional[int] = None
